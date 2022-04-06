@@ -27,7 +27,7 @@ end
 func erc721_ownership(
     account: felt, 
     nft_address: felt, 
-    id: felt
+    nft_id: felt
 ) -> (
     is_owner: felt
 ):
@@ -67,6 +67,20 @@ func get_erc721_address{
     range_check_ptr
 }() -> (address: felt):
     return erc721_address.read()
+end
+
+@view
+func is_owner{
+    syscall_ptr: felt*,
+    pedersen_ptr: HashBuiltin*,
+    range_check_ptr
+}(account: felt, id: felt) -> (result: felt):
+    let (nft_address) = erc721_address.read()
+    return erc721_ownership.read(
+        account=account, 
+        nft_address=nft_address, 
+        nft_id=id
+    )
 end
 
 #	███████╗██╗  ██╗████████╗███████╗██████╗ ███╗   ██╗ █████╗ ██╗     
