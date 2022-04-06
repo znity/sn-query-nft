@@ -5,6 +5,7 @@
 # ownership of an asset on L1
 
 from starkware.cairo.common.cairo_builtins import HashBuiltin
+from starkware.cairo.common.math import assert_not_zero
 from starkware.starknet.common.syscalls import get_caller_address
 
 #	███████╗████████╗ ██████╗ ██████╗  █████╗  ██████╗ ███████╗
@@ -16,6 +17,20 @@ from starkware.starknet.common.syscalls import get_caller_address
 
 @storage_var
 func owner_() -> (owner: felt):
+end
+
+@storage_var
+func erc721_address() -> (address: felt):
+end
+
+@storage_var
+func erc721_ownership(
+    account: felt, 
+    nft_address: felt, 
+    id: felt
+) -> (
+    is_owner: felt
+):
 end
 
 #	 ██████╗███╗   ██╗███████╗████████╗ ██████╗ ██████╗ 
@@ -30,7 +45,9 @@ func constructor{
     syscall_ptr: felt*,
     pedersen_ptr: HashBuiltin*,
     range_check_ptr
-}():
+}(
+    erc721_address: felt
+):
     let (caller) = get_caller_address()
     owner_.write(caller)
     return ()
@@ -43,6 +60,14 @@ end
 #	 ╚████╔╝ ██║███████╗╚███╔███╔╝
 #	  ╚═══╝  ╚═╝╚══════╝ ╚══╝╚══╝ 
 
+@view
+func get_erc721_address{
+    syscall_ptr: felt*,
+    pedersen_ptr: HashBuiltin*,
+    range_check_ptr
+}() -> (address: felt):
+    return erc721_address.read()
+end
 
 #	███████╗██╗  ██╗████████╗███████╗██████╗ ███╗   ██╗ █████╗ ██╗     
 #	██╔════╝╚██╗██╔╝╚══██╔══╝██╔════╝██╔══██╗████╗  ██║██╔══██╗██║     
@@ -51,6 +76,16 @@ end
 #	███████╗██╔╝ ██╗   ██║   ███████╗██║  ██║██║ ╚████║██║  ██║███████╗
 #	╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝
 
+@external
+func set_721_address{
+    syscall_ptr: felt*,
+    pedersen_ptr: HashBuiltin*,
+    range_check_ptr
+}(address: felt):
+    assert_not_zero(address)
+
+    return ()
+end
 
 #	██╗███╗   ██╗████████╗███████╗██████╗ ███╗   ██╗ █████╗ ██╗     
 #	██║████╗  ██║╚══██╔══╝██╔════╝██╔══██╗████╗  ██║██╔══██╗██║     
