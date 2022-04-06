@@ -22,7 +22,7 @@ interface IERC721Read {
 }
 
 /// @notice L1 counter-part of the Cairo contract that reads a token's data
-contract L1Reader {
+contract NFTChecker {
   IStarknetCore starknetCore;
   
   // Function IDs (optional) used while receiving
