@@ -11,7 +11,12 @@ from starkware.starknet.common.syscalls import get_caller_address
 from starkware.starknet.common.messages import send_message_to_l1
 
 const PROVE_NFT_OWNERSHIP = 0
-const L1_ADDRESS = 0x2Db8c2615db39a5eD8750B87aC8F217485BE11EC # TODO: change
+const L1_ADDRESS = 0x2Db8c2615db39a5eD8750B87aC8F217485BE11EC 
+
+# TODO: change l1 address
+# TODO: upload nft
+# TODO: change storage naming convention
+
 
 #	███████╗████████╗ ██████╗ ██████╗  █████╗  ██████╗ ███████╗
 #	██╔════╝╚══██╔══╝██╔═══██╗██╔══██╗██╔══██╗██╔════╝ ██╔════╝
@@ -99,6 +104,8 @@ end
 #	███████╗██╔╝ ██╗   ██║   ███████╗██║  ██║██║ ╚████║██║  ██║███████╗
 #	╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝
 
+# Setters
+
 @external
 func set_721_address{
     syscall_ptr: felt*,
@@ -106,9 +113,12 @@ func set_721_address{
     range_check_ptr
 }(address: felt):
     assert_not_zero(address)
+    only_owner()
 
     return ()
 end
+
+# L1 Communication
 
 @external
 func query_nft_ownership{
@@ -137,6 +147,32 @@ func query_nft_ownership{
 
     return ()
 end
+
+@l1_handler
+func set_owner_of{
+    syscall_ptr: felt*,
+    pedersen_ptr: HashBuiltin*,
+    range_check_ptr
+}(
+    from_address: felt,
+    nft_address: felt,
+    nft_id: felt,
+    owner_address: felt,
+    is_owner: felt
+):
+    # Check if call source is legit
+    assert from_address = L1_ADDRESS
+
+    # Assign ownership
+    erc721_ownership.write(
+        account=owner_address,
+        nft_address=nft_address,
+        nft_id=nft_id,
+        value=is_owner
+    )
+    return ()
+end
+
 
 #	██╗███╗   ██╗████████╗███████╗██████╗ ███╗   ██╗ █████╗ ██╗     
 #	██║████╗  ██║╚══██╔══╝██╔════╝██╔══██╗████╗  ██║██╔══██╗██║     
